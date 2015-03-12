@@ -63,14 +63,14 @@ module Fluent
     def initialize
       super
       require 'active_support/time'
-      require 'uri'
+      require 'addressable/uri'
       require 'net/http'
     end
 
     def configure(conf)
       super
 
-      @channel    = URI.unescape(conf['channel'])
+      @channel    = Addressable::URI.unescape(conf['channel'])
       @username   = conf['username']   || 'fluentd'
       @color      = conf['color']      || 'good'
       @icon_emoji = conf['icon_emoji'] || ':question:'
@@ -93,8 +93,8 @@ module Fluent
     end
 
     def get_request(params)
-      query = URI.encode_www_form(params)
-      uri = URI.parse("https://slack.com/api/chat.postMessage?#{query}")
+      query = Addressable::URI.encode_www_form(params)
+      uri = Addressable::URI.parse("https://slack.com/api/chat.postMessage?#{query}")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -103,7 +103,7 @@ module Fluent
     end
 
     def endpoint
-      URI.parse @webhook_url || "https://#{@team}.slack.com/services/hooks/incoming-webhook?token=#{@api_key}"
+      Addressable::URI.parse @webhook_url || "https://#{@team}.slack.com/services/hooks/incoming-webhook?token=#{@api_key}"
     end
 
     def post_request(data)
